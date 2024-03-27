@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BarangController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\RuanganController;
 
@@ -44,6 +45,15 @@ Route::group(['middleware' => 'api', 'prefix' => 'ruangans'], function () {
     Route::put('/update/{id}', [RuanganController::class, 'update']);
     Route::delete('/{id}', [RuanganController::class, 'destroy']);
 });
+
+Route::group(['middleware' => 'api', 'prefix' => 'barangs'], function () {
+    Route::get('/', [BarangController::class, 'index']);
+    Route::post('/', [BarangController::class, 'store']);
+    Route::get('/{id}', [BarangController::class, 'show']);
+    Route::put('/update/{id}', [BarangController::class, 'update']);
+    Route::delete('/{id}', [BarangController::class, 'destroy']);
+});
+
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
