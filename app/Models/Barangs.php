@@ -12,16 +12,17 @@ class Barangs extends Model
     protected $table = 'barangs';
 
     protected $fillable = [
+        'ruangan_id',
+        'user_id',
         'kode_barang',
         'nama_barang',
-        'merek_barang',
-        'tgl_pembelian',
-        'harga_barang',
+        'spesifikasi',
+        'pengadaan',
         'jenis_barang',
-        'jumlah_barang',
-        'deskripsi_barang',
-        'ketersediaan',
-        'kondisi_barang',
+        'kuantitas',
+        'keterangan_barang',
+        'keadaan_barang',
+        'status_ketersediaan',
         'barcode',
     ];
     public $timestamps = false;

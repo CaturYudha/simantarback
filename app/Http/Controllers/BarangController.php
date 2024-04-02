@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barangs;
+use App\Models\Ruangans;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BarangController extends Controller
 {
@@ -16,38 +18,76 @@ class BarangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'ruangan_id' => 'required|exists:ruangans,id',
             'kode_barang' => 'required|string|unique:barangs',
             'nama_barang' => 'required|string',
-            'merek_barang' => 'nullable|string',
-            'tgl_pembelian' => 'nullable|date',
-            'harga_barang' => 'nullable|integer',
+            'spesifikasi' => 'nullable|string',
+            'pengadaan' => 'nullable|date',
             'jenis_barang' => 'required|in:barang sekolah,barang jurusan',
-            'jumlah_barang' => 'nullable|integer',
-            'deskripsi_barang' => 'nullable|string',
-            'ketersediaan' => 'nullable|in:tersedia,terpakai',
-            'kondisi_barang' => 'nullable|in:baik,rusak',
-            'barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'kuantitas' => 'nullable|integer',
+            'keterangan_barang' => 'nullable|string',
+            'keadaan_barang' => 'nullable|in:baik,rusak ringan,rusak sedang,rusak barat',
+            // 'status_ketersediaan' => 'nullable|in:tersedia,terpakai',
+            'barcode' => 'nullable|image|mimes:png|max:2048',
         ]);
-
-        $data = $request->all();
-
-        if ($request->hasFile('barcode')) {
-            try {
-                $file = $request->file('barcode');
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                $filePath = '/uploads/barcode/' . $fileName;
-                $file->move(public_path('uploads/barcode'), $fileName);
-
-                $data['barcode'] = $filePath;
-
-            } catch (\Exception $e) {
-                return response()->json(['message' => 'Gagal mengunggah file barcode'], 500);
-            }
-        }
-
-        $barang = Barangs::create($data);
-
+    
+        // $user_id = Auth::id(); // Mendapatkan ID pengguna dari token JWT
+        $ruangan_id = $request->ruangan_id; // Mendapatkan ID ruangan dari permintaan
+    
+        // Buat barang dengan data yang diberikan
+        $barang = Barangs::create([
+            'user_id' => $request->user_id,
+            'ruangan_id' => $ruangan_id,
+            'kode_barang' => $request->kode_barang,
+            'nama_barang' => $request->nama_barang,
+            'spesifikasi' => $request->spesifikasi,
+            'pengadaan' => $request->pengadaan,
+            'jenis_barang' => $request->jenis_barang,
+            'kuantitas' => $request->kuantitas,
+            'keterangan_barang' => $request->keterangan_barang,
+            'keadaan_barang' => $request->keadaan_barang,
+            'barcode' => $request->barcode,
+        ]);
+    
         return response()->json(['message' => 'Barang berhasil ditambahkan', 'data' => $barang], 201);
+
+        // $data = $request->all();
+
+
+        // $barang = Barangs::create($data);
+
+        // $barang = Barangs::create($request->all());
+
+        // // Mengambil nama ruangan
+        // $namaRuangan = Ruangans::find($request->ruangan_id)->nama_ruangan;
+
+        // // Membuat konten QR code
+        // $qrCodeContent = [
+        //     'kode_barang' => $barang->kode_barang,
+        //     'nama_barang' => $barang->nama_barang,
+        //     'spesifikasi' => $barang->spesifikasi,
+        //     'pengadaan' => $barang->pengadaan,
+        //     'harga_barang' => $barang->harga_barang,
+        //     'jenis_barang' => $barang->jenis_barang,
+        //     'kuantitas' => $barang->kuantitas,
+        //     'keterangan_barang' => $barang->keterangan_barang,
+        //     'lokasi_ruangan' => $namaRuangan,
+        // ];
+
+        // // Menghasilkan QR code dari konten
+        // $qrCode = QrCode::size(300)->generate(json_encode($qrCodeContent));
+
+        // // Simpan QR code ke dalam file gambar atau tempat penyimpanan lainnya
+        // // Misalnya, Anda dapat menyimpannya dalam direktori public
+        // $filePath = 'uploads/qrcodes/' . $barang->kode_barang . '.png';
+        // $qrCode->writeFile(public_path($filePath));
+
+        // // Simpan path QR code ke dalam database
+        // $barang->barcode = $filePath;
+
+        // $barang->save();
+
+        // return response()->json(['message' => 'Barang berhasil ditambahkan', 'data' => $barang], 201);
     }
 
     public function show($id)
@@ -59,36 +99,53 @@ class BarangController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
+            'ruangan_id' => 'required|exists:ruangans,id',
+            'user_id' => 'required|exists:users,id',
             'nama_barang' => 'sometimes|required|string',
-            'merek_barang' => 'nullable|string',
-            'tgl_pembelian' => 'nullable|date',
-            'harga_barang' => 'nullable|integer',
+            'spesifikasi' => 'nullable|string',
+            'pengadaan' => 'nullable|date',
             'jenis_barang' => 'sometimes|required|in:barang sekolah,barang jurusan',
-            'jumlah_barang' => 'nullable|integer',
-            'deskripsi_barang' => 'nullable|string',
-            'ketersediaan' => 'nullable|in:tersedia,terpakai',
-            'kondisi_barang' => 'nullable|in:baik,rusak',
+            'kuantitas' => 'nullable|integer',
+            'keterangan_barang' => 'nullable|string',
+            // 'status_ketersediaan' => 'nullable|in:tersedia,terpakai',
+            'keadaan_barang' => 'nullable|in:baik,rusak ringan,rusak sedang,rusak berat',
             'barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->all();
-
-        if ($request->hasFile('barcode')) {
-            try {
-                $file = $request->file('barcode');
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                $filePath = '/uploads/barcode/' . $fileName;
-                $file->move(public_path('uploads/barcode'), $fileName);
-
-                $data['barcode'] = $filePath;
-
-            } catch (\Exception $e) {
-                return response()->json(['message' => 'Gagal mengunggah file barcode'], 500);
-            }
-        }
-
         $barang = Barangs::findOrFail($id);
-        $barang->update($data);
+        $barang->update($request->all());
+
+        // // Mengambil nama ruangan
+        // $namaRuangan = Ruangans::find($request->ruangan_id)->nama_ruangan;
+
+        // // Membuat konten QR code
+        // $qrCodeContent = [
+        //     'kode_barang' => $barang->kode_barang,
+        //     'nama_barang' => $barang->nama_barang,
+        //     'spesifikasi' => $barang->spesifikasi,
+        //     'pengadaan' => $barang->pengadaan,
+        //     'harga_barang' => $barang->harga_barang,
+        //     'jenis_barang' => $barang->jenis_barang,
+        //     'kuantitas' => $barang->kuantitas,
+        //     'keterangan_barang' => $barang->keterangan_barang,
+        //     'lokasi_ruangan' => $namaRuangan,
+        // ];
+
+        // // Menghasilkan QR code dari konten
+        // $qrCode = QrCode::size(300)->generate(json_encode($qrCodeContent));
+
+        // // Menghapus QR code lama jika ada
+        // if (file_exists(public_path($barang->barcode))) {
+        //     unlink(public_path($barang->barcode));
+        // }
+
+        // // Simpan QR code ke dalam file gambar atau tempat penyimpanan lainnya
+        // $filePath = 'uploads/qrcodes/' . $barang->kode_barang . '.png';
+        // $qrCode->writeFile(public_path($filePath));
+
+        // // Simpan path QR code ke dalam database
+        // $barang->barcode = $filePath;
+        // $barang->save();
 
         return response()->json(['message' => 'Data barang berhasil diperbarui', 'barang' => $barang], 200);
     }

@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('barang_users', function (Blueprint $table) {
-            $table->id(); // Primary key untuk tabel baru
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+        Schema::create('peminjaman_barangs', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('barang_id')->constrained('barangs')->cascadeOnDelete();
+            $table->foreignId('peminjaman_id')->constrained('peminjamans')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('barang_users');
+        Schema::dropIfExists('peminjaman_barangs');
     }
 };
