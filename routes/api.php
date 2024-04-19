@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PeminjamanController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -55,6 +56,14 @@ Route::group(['middleware' => 'api', 'prefix' => 'barangs'], function () {
     Route::get('/{id}', [BarangController::class, 'show']);
     Route::put('/update/{id}', [BarangController::class, 'update']);
     Route::delete('/{id}', [BarangController::class, 'destroy']);
+});
+
+Route::group(['middleware' => 'api', 'prefix' => 'peminjamans'], function () {
+    Route::get('/', [PeminjamanController::class, 'index']);
+    Route::post('/', [PeminjamanController::class, 'store']);
+    Route::get('/{id}', [PeminjamanController::class, 'show']);
+    Route::put('/update/{id}', [PeminjamanController::class, 'update']);
+    Route::delete('/{id}', [PeminjamanController::class, 'destroy']);
 });
 
 

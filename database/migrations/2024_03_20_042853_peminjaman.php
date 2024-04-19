@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('tgl_peminjaman');
             $table->date('tgl_pengembalian');
             $table->text('keterangan')->nullable();
+            $table->integer('jumlah')->nullable();
             $table->enum('status_peminjaman', ['dipinjam', 'dikembalikan'])->default('dipinjam');
             $table->enum('status_pengajuan', ['disetujui', 'tidak disetujui'])->default('disetujui');
             $table->timestamps();

@@ -6,6 +6,7 @@ use App\Models\Barangs;
 use App\Models\Ruangans;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class BarangController extends Controller
 {
@@ -46,8 +47,24 @@ class BarangController extends Controller
             'kuantitas' => $request->kuantitas,
             'keterangan_barang' => $request->keterangan_barang,
             'keadaan_barang' => $request->keadaan_barang,
-            'barcode' => $request->barcode,
         ]);
+
+        $barcodeContent = [
+            'kode_barang' => $barang->kode_barang,
+            'nama_barang' => $barang->nama_barang,
+            'spesifikasi' => $barang->spesifikasi,
+            'pengadaan' => $barang->pengadaan,
+            'jenis_barang' => $barang->jenis_barang,
+            'kuantitas' => $barang->kuantitas,
+            'keterangan_barang' => $barang->keterangan_barang,
+            'keadaan_barang' => $barang->keadaan_barang,
+            
+            
+            // Add other relevant information
+        ];
+        
+        // Generate barcode
+        $barcode = QrCode::size(300)->generate(json_encode($barcodeContent));
     
         return response()->json(['message' => 'Barang berhasil ditambahkan', 'data' => $barang], 201);
 
